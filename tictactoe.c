@@ -7,7 +7,7 @@
 // Prototypen
 void spielfeldzeigen(char spielfeld[3][3]);
 bool spielzug(char spielfeld[3][3], int spieler);
-bool checkEnd(char spielfeld[3][3]);
+int checkEnd(char spielfeld[3][3]);
 
 // Global Variables
 char spieler1[30];
@@ -51,6 +51,7 @@ int main() {
     printf("Spieler %s beginnt!\n", spieler2);
   }
 
+  int winner = 0;
   while (gameRunning) {
     bool zugerfolgreich = false;
     if (spielerAmZug == 1) {
@@ -64,10 +65,15 @@ int main() {
     if (zugerfolgreich) {
       spielfeldzeigen(spielfeld);
     }
-	if(checkEnd(spielfeld)) {
-		//TODO: Spiel ist zuende. Sieger Kueren
-		 
-	}
+    winner = checkEnd(spielfeld);
+    if (winner > 0) {
+      if (winner == 1) {
+        printf("Glueckwunsch %s, du hast gewonnen\n", spieler1);
+      } else if (winner == 2) {
+        printf("Glueckwunsch %s, du hast gewonnen\n", spieler2);
+      }
+      return 0;
+    }
   }
 }
 
@@ -117,7 +123,7 @@ bool spielzug(char spielfeld[3][3], int spieler) {
   }
   x--;
   y--;
-  if (spielfeld[x][y] != ' ') {
+  if (spielfeld[y][x] != ' ') {
     printf("Feld %d|%d ist schon besetzt. Bitte waehle ein anderes Feld fuer "
            "deinen Zug!\n",
            x + 1, y + 1);
@@ -125,9 +131,9 @@ bool spielzug(char spielfeld[3][3], int spieler) {
   }
   char zeichen;
   if (spieler == 1) {
-    spielfeld[x][y] = zeichenS1;
+    spielfeld[y][x] = zeichenS1;
   } else if (spieler == 2) {
-    spielfeld[x][y] = zeichenS2;
+    spielfeld[y][x] = zeichenS2;
   } else {
     printf("Spieler am Zug: %d - Irgendwas ist hier falsch!", spieler);
     return false;
@@ -136,4 +142,58 @@ bool spielzug(char spielfeld[3][3], int spieler) {
   return true;
 }
 
-bool checkEnd(char spielfeld[3][3]) {}
+int checkEnd(char spielfeld[3][3]) {
+  if ((spielfeld[0][0] == spielfeld[0][1] &&
+       spielfeld[0][0] == spielfeld[0][2]) ||
+      (spielfeld[0][0] == spielfeld[1][0] &&
+       spielfeld[0][0] == spielfeld[2][0]) ||
+      (spielfeld[0][0] == spielfeld[1][1] &&
+       spielfeld[0][0] == spielfeld[2][2])) {
+    if (spielfeld[0][0] == zeichenS1) {
+      // Spieler 1 gewinnt
+      return 1;
+    } else if (spielfeld[0][0] == zeichenS2) {
+      // Spieler 2 gewinnt
+      return 2;
+    } else if (spielfeld[0][0] == ' ') {
+      return 0;
+    } else {
+      printf("Unbekannter Gewinner: %c\n", spielfeld[0][0]);
+    }
+  } else if ((spielfeld[0][1] == spielfeld[1][1] &&
+              spielfeld[0][1] == spielfeld[2][1]) ||
+             (spielfeld[1][0] == spielfeld[1][1] &&
+              spielfeld[1][0] == spielfeld[1][2]) ||
+             (spielfeld[0][2] == spielfeld[1][1] &&
+              spielfeld[0][2] == spielfeld[2][0])) {
+    if (spielfeld[1][1] == zeichenS1) {
+      // Spieler 1 gewinnt
+      return 1;
+    } else if (spielfeld[1][1] == zeichenS2) {
+      // Spieler 2 gewinnt
+      return 2;
+    } else if (spielfeld[1][1] == ' ') {
+      return 0;
+    } else {
+      printf("Unbekannter Gewinner: %c\n", spielfeld[1][1]);
+    }
+  } else if ((spielfeld[2][0] == spielfeld[2][1] &&
+              spielfeld[2][0] == spielfeld[2][2]) ||
+             (spielfeld[0][2] == spielfeld[1][2] &&
+              spielfeld[0][2] == spielfeld[2][2])) {
+    if (spielfeld[2][2] == zeichenS1) {
+      // Spieler 1 gewinnt
+      return 1;
+    } else if (spielfeld[2][2] == zeichenS2) {
+      // Spieler 2 gewinnt
+      return 2;
+    } else if (spielfeld[2][2] == ' ') {
+      return 0;
+    } else {
+      printf("Unbekannter Gewinner: %c\n", spielfeld[2][2]);
+    }
+  } else {
+    // Kein Gewinner bisher
+    return 0;
+  }
+}
