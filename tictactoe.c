@@ -8,6 +8,8 @@
 void spielfeldzeigen(char spielfeld[3][3]);
 bool spielzug(char spielfeld[3][3], int spieler);
 int checkEnd(char spielfeld[3][3]);
+void spielfeldInitialisieren();
+void zweispielersiel();
 
 // Global Variables
 char spieler1[30];
@@ -15,22 +17,51 @@ char spieler2[30];
 char zeichenS1;
 char zeichenS2;
 int spielerAmZug = 0;
+int gesamtZuege = 0;
 bool gameRunning = true;
+char spielfeld[3][3];
 
 int main() {
-  printf("Willkommen zu Tic-Tac-Toe\n");
-  char spielfeld[3][3];
-  for (int i = 0; i < 3; i++) {
-    for (int j = 0; j < 3; j++) {
-      spielfeld[i][j] = ' ';
+      printf("Willkommen zu Tic-Tac-Toe\n");
+  while (true) {
+    printf(
+        "Wenn sie wissen wollen, wie Tic-Tac-Toe funktioniert, googlen sie\n");
+    printf(
+        "Wenn sie ein 2-Spieler Spiel starten wollen, geben sie \'s\' ein.\n");
+    printf("Wenn sie gegen den Computer spielen wollen, geben sie \'c\' ein\n");
+    printf("Wenn sie das spiel beenden wollen, geben sie \'e\' ein\n");
+    char buf0[1024] = "";
+    scanf("%99s", &buf0[0]);
+    if (strlen(buf0) > 0) {
+      char auswahl = buf0[0];
+      if (auswahl == 's') {
+        zweispielersiel();
+      } else if (auswahl == 'c') {
+        // TODO: Kommt noch
+      } else if (auswahl == 'e') {
+        printf("Bye Bye\n");
+        return 0;
+      } else {
+        printf("Unbekannte Eingabe %c. Beende.\n", auswahl);
+        return 0;
+      }
+    } else {
+      printf("Keine Eingabe gefunden. Beende. Eingabe: %s\n", buf0);
+      return 0;
     }
   }
+}
+
+void zweispielersiel() {
+  spielfeldInitialisieren();
+  // Spieler Name und Zeichen einlesen
   char buf1[1024] = "";
   char buf2[1024] = "";
   printf("Spieler 1, bitte geben sie ihren Namen ein (Max. 30 Buchstaben): ");
   scanf("%99s", &spieler1[0]);
   printf("Spieler 1, bitte geben sie ihr Zeichen ein (Nur ein Buchstabe): ");
   scanf("%99s", &buf1[0]);
+  // TODO: String eingaben gegen Escape Characters absichern
   if (strlen(buf1) > 0) {
     zeichenS1 = buf1[0];
   }
@@ -41,6 +72,7 @@ int main() {
   if (strlen(buf2) > 0) {
     zeichenS2 = buf2[0];
   }
+  // Auswuerfeln welcher Spieler anfaengt
   printf("Lasset die Spiele Beginnen. ");
   srand(time(NULL));
   if ((rand() % ((99 + 1) - 1)) + 1 > 50) {
@@ -51,6 +83,7 @@ int main() {
     printf("Spieler %s beginnt!\n", spieler2);
   }
 
+  // Solange kein Gewinner feststeht abwechselnd Spielzuege taetigen
   int winner = 0;
   while (gameRunning) {
     bool zugerfolgreich = false;
@@ -72,7 +105,20 @@ int main() {
       } else if (winner == 2) {
         printf("Glueckwunsch %s, du hast gewonnen\n", spieler2);
       }
-      return 0;
+      gameRunning = false;
+    } else {
+      if (gesamtZuege == 9) {
+        printf("Unentschiedenn");
+        gameRunning = false;
+      }
+    }
+  }
+}
+
+void spielfeldInitialisieren() {
+  for (int i = 0; i < 3; i++) {
+    for (int j = 0; j < 3; j++) {
+      spielfeld[i][j] = ' ';
     }
   }
 }
@@ -96,11 +142,11 @@ void spielfeldzeigen(char spielfeld[3][3]) {
 
 bool spielzug(char spielfeld[3][3], int spieler) {
   if (spieler == 1) {
-    printf("Spieler %s, bitte waehle eine Koordinate fuer deinen Zug: ",
-           spieler1);
+    printf("Spieler %s, bitte waehle eine Koordinate fuer deinen Zug (Zeichen: %c): ",
+           spieler1, zeichenS1);
   } else {
-    printf("Spieler %s, bitte waehle eine Koordinate fuer deinen Zug: ",
-           spieler2);
+    printf("Spieler %s, bitte waehle eine Koordinate fuer deinen Zug (Zeiche: %c): ",
+           spieler2, zeichenS2);
   }
   char coord[2];
   scanf("%s", &coord);
@@ -139,6 +185,7 @@ bool spielzug(char spielfeld[3][3], int spieler) {
     return false;
   }
   spielerAmZug = (spielerAmZug % 2) + 1;
+  gesamtZuege++;
   return true;
 }
 
